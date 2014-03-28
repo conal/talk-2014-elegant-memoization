@@ -78,7 +78,7 @@ I'm going to give a talk on memoization for the [Haskell meetup on April 3, 2014
     *   Purely functional, directed by type isomorphisms.
     *   Practical in a non-strict language!
     *   Best of both worlds: incremental tabulation and simple denotation.
-        Operational optimization/messiness (mutation) to the language *implementation*.
+        Leave operational optimization/messiness (mutation) to the language *implementation*.
         Contrast with an eager or imperative setting.
 *   An *almost* beautiful story:
     *   However, there's an ironic flaw in this story: the type isomorphisms only hold for a *strict* language.

@@ -44,3 +44,11 @@
 %format :->: = "\mapsto"
 
 %% or \mapsto
+
+%format === = "\!\!\!\!\! \equiv "
+
+%% %format *** = "\mathbin{\times}"
+%% %format &&& = "\mathbin{\smalltriangleup}"
+%% %format ||| = "\mathbin{\smalltriangledown}"
+
+%format ||| = "\ \, \mathbin{\symThree{|}}\ \, "
