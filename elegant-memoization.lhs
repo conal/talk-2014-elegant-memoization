@@ -448,6 +448,14 @@ Re-interpret as recipe for \emph{logarithms}.
 Examples:
 
 \begin{center}
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK data P  a = P a a
+> BACK data S  a = C a (S a)
+> BACK data T  a = B a (P (T a))
+
+\end{minipage}}
+\pause
 \fbox{\begin{minipage}[c]{0.46\textwidth}
 
 > BACK P  a = a :* a
@@ -455,31 +463,24 @@ Examples:
 > BACK T  a = a :* P (T a)
 
 \end{minipage}}
-\pause
-\fbox{\begin{minipage}[c]{0.53\textwidth}
-
-> BACK PL  = F :+ T
-> BACK SL  = Unit :+ SL
-> BACK TL  = Unit :+ PL :* TL
-
-\end{minipage}}
 \end{center}
 
 \pause
 
 \begin{center}
-\fbox{\begin{minipage}[c]{0.46\textwidth}
-
-> BACK data P  a = P a a
-> BACK data S  a = C a (S a)
-> BACK data T  a = B a (P (T a))
-
-\end{minipage}}
 \fbox{\begin{minipage}[c]{0.53\textwidth}
 
 > BACK data PL  = False  | True
 > BACK data SL  = Zero   | Succ SL
 > BACK data TL  = Empty  | Dig PL TL
+
+\end{minipage}}
+\pause
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> BACK PL  = F :+ T
+> BACK SL  = Unit :+ SL
+> BACK TL  = Unit :+ PL :* TL
 
 \end{minipage}}
 \end{center}
