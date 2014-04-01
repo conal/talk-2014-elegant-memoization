@@ -31,7 +31,7 @@
 
 \title{Elegant memoization}
 \author{\href{http://conal.net}{Conal Elliott}}
-% \institute{\href{http://tabula.com/}{Tabula}}
+\institute{\href{http://www.tabula.com/}{Tabula}}
 % Abbreviate date/venue to fit in infolines space
 \date{\href{http://www.meetup.com/haskellhackersathackerdojo/events/132372202/}{April 3, 2014}}
 
@@ -76,7 +76,7 @@
 
 \begin{itemize} \itemsep 4ex
 \pitem Conventional story: mutable hash tables.
-\pitem Irony: only correct for pure functions.
+\pitem Ironic flaw: only correct for pure functions.
 \pitem My definition: \emph{conversion of functions into data structures}
 \pitem ... without loss of information.
 \pitem How?
@@ -103,7 +103,7 @@ I'll use some non-standard (for Haskell) type notation:
 
 \pause
 
-> g :: () -> String
+> g :: Unit -> String
 > g () = map toUpper "memoize!"
 
 \pause
@@ -134,11 +134,12 @@ I'll use some non-standard (for Haskell) type notation:
 \item
   Remember: conversion of functions into data structures.
 \item
-  We can think of a function as an indexed collection.
+  Functions as indexed collections.
 \item
-  But a differently shaped collection for each domain type.
+  Differently shaped collection for each domain type.
 \item
-  Look at these domain types systematically:\\ |Unit|, |a :+ b|, |a :* b|, |a -> b|, |data|.
+  Consider domain types systematically\pause:\\
+  |Unit|, |a :+ b|, |a :* b|, |a -> b|, |data|.
 \end{itemize}
 }
 
@@ -196,13 +197,14 @@ From \href{http://hackage.haskell.org/package/MemoTrie}{|MemoTrie|}:
 >   trie    :: (a   ->   c)  -> (a :->: c)
 >   untrie  :: (a  :->:  c)  -> (a  ->  c)
 
-Law: |trie| and |untrie| are inverses \pause (modulo |undefined|).
-
-\pause
+Law: |trie| and |untrie| are inverses (modulo |undefined|).
+%% \\ \pause (Really, |untrie . trie <<= id|, and |trie . untrie == id|.)
 
 \vspace{3ex}
 
 Memoization:
+
+\pause
 
 > memo :: HasTrie a => (a -> c) -> (a -> c)
 > memo = untrie . trie
@@ -211,13 +213,14 @@ Memoization:
 
 \framet{Unit}{
 
-> instance HasTrie () where
->   type () :->: c = c
+> instance HasTrie Unit where
+>   type Unit :->: c = c
 >   trie f = f ()
 >   untrie c = \ () -> c
 
 \pause
-Laws:
+
+Laws:\vspace{-1ex}
 \begin{center}
 \fbox{\begin{minipage}[t]{0.47\textwidth}
 
@@ -394,11 +397,11 @@ where
 
 \framet{Data types}{
 
-Handle data types via isomorphism:
+Handle other types via isomorphism:
 
 > a :* b :* c =~ (a :* b) :* c
 >
-> [a] =~ Unit :+ a :* []
+> [a] =~ Unit :+ a :* [a]
 >
 > T a =~ a :+ T a :* T a
 > 
@@ -422,6 +425,64 @@ Associated functors:
 > Trie Unit      = Id
 > Trie (a :+ b)  = Trie a  :*:  Trie b
 > Trie (a :* b)  = Trie a  :.   Trie b
+
+}
+
+\framet{Logarithms}{
+
+Type isomorphisms:
+\begin{minipage}[c]{0.6\textwidth}
+
+>    Unit   :->: c =~ c
+> (a :+ b)  :->: c =~ (a :->: c) :* (b :->: c)
+> (a :* b)  :->: c =~ a :->: (b :->: c)
+
+\end{minipage}
+
+\pause
+Re-interpret as recipe for \emph{logarithms}.
+(Whose memo trie?)
+
+\pause\vspace{3ex}
+
+Examples:
+
+\begin{center}
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> BACK P  a = a :* a
+> BACK S  a = a :* S a
+> BACK T  a = a :* P (T a)
+
+\end{minipage}}
+\pause
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK PL  = F :+ T
+> BACK SL  = Unit :+ SL
+> BACK TL  = Unit :+ PL :* TL
+
+\end{minipage}}
+\end{center}
+
+\pause
+
+\begin{center}
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> BACK data P  a = P a a
+> BACK data S  a = C a (S a)
+> BACK data T  a = B a (P (T a))
+
+\end{minipage}}
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK data PL  = False  | True
+> BACK data SL  = Zero   | Succ SL
+> BACK data TL  = Empty  | Dig PL TL
+
+\end{minipage}}
+\end{center}
 
 }
 
