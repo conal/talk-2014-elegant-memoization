@@ -30,8 +30,7 @@ clean:
 
 web: web-token
 
-# HOST = conal.net
-HOST = 174.143.243.105
+HOST = conal.net
 
 STASH=conal@$(HOST):/home/conal/web/talks
 
