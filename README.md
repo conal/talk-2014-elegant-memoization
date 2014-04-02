@@ -1,11 +1,6 @@
-
- <!-- References -->
-
 [*Memo Functions, Polytypically!*]: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.43.3272 "paper by Ralf Hinze"
 
 [MemoTrie]: http://hackage.haskell.org/package/MemoTrie "Haskell library"
-
- <!-- -->
 
 # Elegant memoization
 
