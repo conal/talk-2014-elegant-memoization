@@ -33,7 +33,7 @@
 \author{\href{http://conal.net}{Conal Elliott}}
 \institute{\href{http://www.tabula.com/}{Tabula}}
 % Abbreviate date/venue to fit in infolines space
-\date{\href{http://www.meetup.com/haskellhackersathackerdojo/events/132372202/}{April 3, 2014}}
+\date{\href{http://www.meetup.com/haskellhackersathackerdojo/events/151894212/}{April 3, 2014}}
 
 \setlength{\itemsep}{2ex}
 \setlength{\parskip}{1ex}
