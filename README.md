@@ -21,6 +21,6 @@ Ironically, the technique is only correct for pure functions.
 
 I'm going to talk about purely functional memoization.
 The idea, [due to Ralf Hinze][*Memo Functions, Polytypically!*], is to use a few simple type isomorphisms to guide and justify the memoization, leading to the systematic construction of *trie* data structures ("digital search trees") from first principles.
-[One implementation][MemoTrie] of the idea in Haskell uses associated types.
+I'll show [a Haskell implementation][MemoTrie] of the idea, adapted from code by Spencer Janssen and using associated types.
 
  </blockquote>
