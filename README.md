@@ -10,7 +10,7 @@ Abstract:
 
  <blockquote>
 
-Functional programming languages (FPLs) emphasize the use of (pure) functions, but they also carry an implementation bias against them.
+Functional programming languages emphasize the use of (pure) functions, but they also carry an implementation bias against them.
 In most functional programming languages, including Haskell, if you express a value and then access it twice, you'll pay only once.
 For data structures, every component has this property.
 For functions, however, an analogous property does not hold: if you apply a function twice to the same argument, the result will be recomputed.
