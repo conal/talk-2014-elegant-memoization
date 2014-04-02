@@ -45,10 +45,16 @@
 
 %% or \mapsto
 
-%format === = "\!\!\!\!\! \equiv "
+%format === = "\Back \equiv "
 
 %% %format *** = "\mathbin{\times}"
 %% %format &&& = "\mathbin{\smalltriangleup}"
 %% %format ||| = "\mathbin{\smalltriangledown}"
 
 %format ||| = "\ \, \mathbin{\symThree{|}}\ \, "
+
+%format <<= = "\sqsubseteq"
+
+%format BACK = "\Back"
+
+%format PBACK = "\pause\Back"
