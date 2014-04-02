@@ -30,8 +30,11 @@ clean:
 
 web: web-token
 
-STASH=conal@conal.net:/home/conal/web/talks
-# STASH=conal@conal-lin:/home/conal/talks
+# HOST = conal.net
+HOST = 174.143.243.105
+
+STASH=conal@$(HOST):/home/conal/web/talks
+
 web: web-token
 
 web-token: $(TARG).pdf
