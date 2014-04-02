@@ -1,11 +1,4 @@
----
-title: Elegant memoization
-substMap: [("&&&","△"), ("***", "×"), ("|||","▽"), ("+++","+"),(":+>","☞"),("Void","0"),("Unit","1"),("<>","⊕")]
-...
-
-# Outline
-
-I'm going to give a talk on memoization for the [Haskell meetup on April 3, 2014](http://www.meetup.com/haskellhackersathackerdojo/events/151894212/).
+Talk outline:
 
 *   Laziness:
     *   With laziness, we don't compute a value until inspected, and then the value is saved for reuse.
@@ -31,15 +24,15 @@ I'm going to give a talk on memoization for the [Haskell meetup on April 3, 2014
     *   We can think of a function as an indexed collection.
     *   But a differently shaped collection for each domain type.
     *   So let's look at these domain types systematically, starting with *very* simple ones and building up.
-        We'll start with `Unit`, `(:+)`, `(:*)`, and `(->)`.
+        We'll start with `Unit`, `(+)`, `(*)`, and `(->)`.
 *   Type isomorphisms
     *   We want to capture all of a function's information into a data structure.
     *   What does it mean to capture all information? The ability to convert back (isomorphism).
     *   Our examples suggest that the structure's shape depends only on the domain type.
         Let's look at type isomorphisms for various domains:
         *   `Unit`;
-        *   `a :+ b`;
-        *   `a :* b`;
+        *   `a + b`;
+        *   `a * b`;
         *   `a -> b` (oops);
         *   Other types.
         *   What about bottoms?
