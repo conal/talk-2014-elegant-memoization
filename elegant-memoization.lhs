@@ -212,6 +212,20 @@ Memoization:
 
 }
 
+\framet{Void}{
+
+> instance HasTrie Void where
+>   type Void :->: t = Unit
+>   trie void = ()
+>   untrie () = void
+
+where
+
+> void :: Void -> z
+> -- empty definition
+
+}
+
 \framet{Unit}{
 
 > instance HasTrie Unit where
@@ -452,6 +466,40 @@ The type isomorphisms only hold for a \emph{strict} language.
 }
 
 \framet{Correctness Proofs}{}
+
+\framet{Void}{
+
+> instance HasTrie Void where
+>   type Void :->: t = Unit
+>   trie void = ()
+>   untrie () = void
+
+%% where
+
+%% > void :: Void -> z
+%% > -- empty definition
+
+\pause
+
+Laws:\vspace{-1ex}
+\begin{center}
+\fbox{\begin{minipage}[t]{0.47\textwidth}
+
+>      untrie (trie void)
+> ===  untrie ()
+> ===  void
+
+\end{minipage}}
+\fbox{\begin{minipage}[t]{0.47\textwidth}
+
+>      trie (untrie ())
+> ===  trie void
+> ===  ()
+
+\end{minipage}}
+\end{center}
+
+}
 
 \framet{Unit}{
 
