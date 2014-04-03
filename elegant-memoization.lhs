@@ -40,8 +40,6 @@
 
 \setlength{\blanklineskip}{1.5ex}
 
-\setlength{\fboxsep}{-2ex}
-
 \nc\pitem{\pause \item}
 
 %%%%
@@ -316,6 +314,8 @@ $$\begin{array}{rcl}
 
 \pause
 
+\setlength{\fboxsep}{-1ex}
+
 \begin{center}
 \fbox{\begin{minipage}[c]{0.53\textwidth}
 
@@ -356,27 +356,44 @@ $$\begin{array}{rcl}
 
 }
 
+\setlength{\fboxsep}{1.5ex}
+
 \framet{Memoization via higher-order types}{
 
 Functor combinators:
 
-> data     Empty        a = Empty
+> data     Const b      a = Const b
 > newtype  Id           a = Id a
 > data     (f  :+:  g)  a = Sum   (f a :+ g a)
 > data     (f  :*:  g)  a = Prod  (f a :* g a)
 > newtype  (g  :.   f)  a = Comp  (g (f a))
 
-\vspace{1ex}
+%\vspace{1ex}
 
 \pause
-Associated functors:
 
-> Trie     Void   = Empty
-> Trie     Unit   = Id
-> Trie (a  :+ b)  = Trie a  :*:  Trie b
-> Trie (a  :* b)  = Trie a  :.   Trie b
+\fbox{\begin{minipage}[c]{0.45\textwidth} \small
+Exponents:
 
+> Exp     Void   = Const Unit
+> Exp     Unit   = Id
+> Exp (a  :+ b)  = Exp a  :*:  Exp b
+> Exp (a  :* b)  = Exp a  :.   Exp b
+
+\end{minipage}}
+\pause
+\fbox{\begin{minipage}[c]{0.45\textwidth} \small
+Logarithms:
+
+> Log (Const b)    =        Void
+> Log Id           =        Unit
+> Log (f  :*:  g)  = Log f  :+ Log g
+> Log (g  :.   f)  = Log g  :* Log f
+
+\end{minipage}}
 }
+
+\setlength{\fboxsep}{-2ex}
 
 \framet{An \emph{almost} beautiful story}{
 
