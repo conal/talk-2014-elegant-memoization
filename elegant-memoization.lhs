@@ -88,7 +88,7 @@
 I'll use some non-standard (for Haskell) type notation:
 
 > type Unit  = ()
-> data Void 
+> data Void  -- no values
 > type (:*)  = (,)
 > type (:+)  = Either
 >
@@ -155,20 +155,20 @@ I'll use some non-standard (for Haskell) type notation:
 }
 
 \nc{\iso}[2]{\pause #1 \to a &\cong& \pause #2 \\}
-\nc{\equi}[2]{\pause a^{#1} &=& #2 \\}
+\nc{\equi}[2]{a^{#1} &=& #2 \\}
 
 \framet{Type isomorphisms}{
 
 $$\begin{array}{rcl}
-\iso{Void}{Unit}
-\iso{1}{a}
+\iso{\Void}{\Unit}
+\iso{\Unit}{a}
 \iso{(b + c)}{(b \to a) \times (c \to a)}
 \iso{(b \times c)}{c \to (b \to a)}
 \end{array}$$
 
 \pause
 
-\vspace{2ex}
+\vspace{1ex}
 
 Compare with laws of exponents:
 
@@ -179,12 +179,12 @@ $$\begin{array}{rcl}
 \equi{b \times c}{(a ^ b) ^ c}
 \end{array}$$
 
-\vspace{3ex}
+\vspace{2ex}
 
 \pause These rules form a memoization algorithm.
 \pause Termination?
 
-\vspace{2ex}
+\vspace{1ex}
 
 \pause
 \emph{Catch:} bottoms.
@@ -213,6 +213,228 @@ Memoization:
 > memo = untrie . trie
 
 }
+
+\framet{Unit}{
+
+> instance HasTrie Unit where
+>   type Unit :->: t = t
+>   trie f = f ()
+>   untrie x = \ () -> x
+
+}
+
+\framet{Boolean}{
+
+> instance HasTrie Bool where
+>   type Bool :->: t = (t,t)
+>   trie f = (f False, f True)
+>   untrie (x,y) = \ c -> if c then y else x
+
+}
+
+\framet{Sums}{
+
+> instance (HasTrie a, HasTrie b) => HasTrie (a :+ b) where
+>   type (a :+ b) :->: t = (a :->: t) :* (b :->: t)
+>   trie f = (trie (f . Left), trie (f . Right))
+>   untrie (s,t) = untrie s ||| untrie t
+
+where
+
+> (g ||| h) (Left   a)  = g a
+> (g ||| h) (Right  b)  = h b
+
+}
+
+\framet{Products}{
+
+> instance (HasTrie a, HasTrie b) => HasTrie (a,b) where
+>   type (a,b) :->: x = a :->: (b :->: x)
+>   trie f = trie (trie . curry f)
+>   untrie t = uncurry (untrie .  untrie t)
+
+where
+
+> curry    g x y    = g (x,y)
+> uncurry  h (x,y)  = h x y
+
+}
+
+\framet{Data types}{
+
+Handle other types via isomorphism:
+
+\vspace{2ex}
+
+> (u, v, w) =~ (u :* v) :* w
+> SPACE
+> [u] =~ Unit :+ u :* [u]
+> SPACE
+> T u =~ u :+ T u :* T u
+> SPACE
+> Bool =~ Unit :+ Unit
+
+}
+
+% \rnc{\equi}[2]{a^{#1} &=& #2 \\}
+
+\nc{\logEqui}[2]{\log_a #2 &=& #1 \\}
+
+\framet{Turn it around}{
+
+Exponentials:
+
+$$\begin{array}{rcl}
+\equi{0}{1}
+\equi{1}{a}
+\equi{b + c}{a^b \times a^c}
+\equi{b \times c}{(a ^ b) ^ c}
+\end{array}$$
+
+\pause\vspace{2ex}
+Take logarithms, and flip equations:
+
+$$\begin{array}{rcl}
+\logEqui{0}{1}
+\logEqui{1}{a}
+\logEqui{b + c}{a^b \times a^c}
+\logEqui{b \times c}{(a ^ b) ^ c}
+\end{array}$$
+
+}
+
+\framet{Logarithms}{
+
+$$\begin{array}{rcl}
+\logEqui{0}{1}
+\logEqui{1}{a}
+\logEqui{b + c}{a^b \times a^c}
+\logEqui{b \times c}{(a ^ b) ^ c}
+\end{array}$$
+
+\pause\vspace{2ex} Game: whose memo trie is it?
+
+\pause
+
+\begin{center}
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK data P  a = P a a
+> BACK data S  a = C a (S a)
+> BACK data T  a = B a (P (T a))
+
+\end{minipage}}
+\pause
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> P  a =~ a :* a
+> S  a =~ a :* S a
+> T  a =~ a :* P (T a)
+
+\end{minipage}}
+\end{center}
+
+\pause
+
+\begin{center}
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK data LP  = False  | True
+> BACK data LS  = Zero   | Succ LS
+> BACK data LT  = Empty  | Dig LP LT
+
+\end{minipage}}
+% \pause
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> LP  =~ Unit :+ Unit
+> LS  =~ Unit :+ SL
+> LT  =~ Unit :+ LP :* LT
+
+\end{minipage}}
+\end{center}
+
+}
+
+\framet{Memoization via higher-order types}{
+
+Functor combinators:
+
+> data     Empty        a = Empty
+> newtype  Id           a = Id a
+> data     (f  :+:  g)  a = Sum   (f a :+ g a)
+> data     (f  :*:  g)  a = Prod  (f a :* g a)
+> newtype  (g  :.   f)  a = Comp  (g (f a))
+
+\vspace{1ex}
+
+\pause
+Associated functors:
+
+> Trie     Void   = Empty
+> Trie     Unit   = Id
+> Trie (a  :+ b)  = Trie a  :*:  Trie b
+> Trie (a  :* b)  = Trie a  :.   Trie b
+
+}
+
+\framet{An \emph{almost} beautiful story}{
+
+\begin{itemize} \itemsep 3ex
+\item
+  Memoization: \emph{conversion of functions into data structures}.
+\item
+  Purely functional, directed by type isomorphisms.
+\item
+  Practical in a non-strict language!
+\item
+  Simple denotation \emph{and} incremental tabulation.
+\end{itemize}
+
+\vspace{3ex}
+
+However, an ironic flaw:
+
+\pause
+
+\begin{center}
+The type isomorphisms only hold for a \emph{strict} language.
+\end{center}
+
+%% \pause 
+%% Recall: imperative memoization has the opposite irony.
+
+}
+
+\framet{Some memoization challenges}{
+
+\begin{itemize} \itemsep 3ex
+\item
+  Non-strict
+\item
+  Higher-order
+\item
+  Polymorphic
+\item
+  Deep
+\end{itemize}
+}
+
+\hypersetup{colorlinks=true,urlcolor=blue}
+
+\framet{References}{
+
+\begin{itemize} \itemsep 3ex
+\item Ralf Hinze's paper \href{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.43.3272}{\emph{Memo functions, polytypically!}}.
+\item \href{http://conal.net/talks/elegant-memoization/}{These slides}
+\item |MemoTrie|: \href{http://hackage.haskell.org/package/MemoTrie}{Hackage}, \href{https://github.com/conal/MemoTrie}{GitHub}
+\item \href{http://hackage.haskell.org/package/data-memocombinators}{data-memocombinators}
+\item \href{http://conal.net/blog/tag/trie/}{Memoization blog posts}
+\end{itemize}
+
+}
+
+\framet{Correctness Proofs}{}
 
 \framet{Unit}{
 
@@ -352,8 +574,8 @@ where
 
 where
 
-> curry    g x y   = g (x,y)
-> uncurry  h (x,y) = h x y
+> curry    g x y    = g (x,y)
+> uncurry  h (x,y)  = h x y
 
 \vspace{-5ex}
 \pause
@@ -396,177 +618,6 @@ where
 
 \end{minipage}}
 \end{center}
-}
-
-\framet{Data types}{
-
-Handle other types via isomorphism:
-
-> u :* v :* w =~ (u :* v) :* w
->
-> [u] =~ Unit :+ u :* [u]
->
-> T u =~ u :+ T u :* T u
-> 
-> Bool =~ Unit :+ Unit
-
-}
-
-\rnc{\equi}[2]{a^{#1} &=& #2 \\}
-
-\nc{\logEqui}[2]{\log_a #2 &=& #1 \\}
-
-\framet{Turn it around}{
-
-Exponentials:
-
-$$\begin{array}{rcl}
-\equi{0}{1}
-\equi{1}{a}
-\equi{b + c}{a^b \times a^c}
-\equi{b \times c}{(a ^ b) ^ c}
-\end{array}$$
-
-\pause\vspace{2ex}
-Take logarithms, and flip equations:
-
-$$\begin{array}{rcl}
-\logEqui{0}{1}
-\logEqui{1}{a}
-\logEqui{b + c}{a^b \times a^c}
-\logEqui{b \times c}{(a ^ b) ^ c}
-\end{array}$$
-
-}
-
-\framet{Logarithms}{
-
-$$\begin{array}{rcl}
-\logEqui{0}{1}
-\logEqui{1}{a}
-\logEqui{b + c}{a^b \times a^c}
-\logEqui{b \times c}{(a ^ b) ^ c}
-\end{array}$$
-
-\pause\vspace{2ex} Game: whose memo trie?
-
-\pause
-
-\begin{center}
-\fbox{\begin{minipage}[c]{0.53\textwidth}
-
-> BACK data P  a = P a a
-> BACK data S  a = C a (S a)
-> BACK data T  a = B a (P (T a))
-
-\end{minipage}}
-\pause
-\fbox{\begin{minipage}[c]{0.46\textwidth}
-
-> BACK type P  a = a :* a
-> BACK type S  a = a :* S a
-> BACK type T  a = a :* P (T a)
-
-\end{minipage}}
-\end{center}
-
-\pause
-
-\begin{center}
-\fbox{\begin{minipage}[c]{0.53\textwidth}
-
-> BACK data LP  = False  | True
-> BACK data LS  = Zero   | Succ LS
-> BACK data LT  = Empty  | Dig LP LT
-
-\end{minipage}}
-% \pause
-\fbox{\begin{minipage}[c]{0.46\textwidth}
-
-> BACK type LP  = Unit :+ Unit
-> BACK type LS  = Unit :+ SL
-> BACK type LT  = Unit :+ LP :* LT
-
-\end{minipage}}
-\end{center}
-
-}
-
-\framet{Memoization via higher-order types}{
-
-Functor combinators:
-
-> data     Empty        a = Empty
-> newtype  Id           a = Id a
-> data     (f  :*:  g)  a = Prod  (f a :* g a)
-> newtype  (g  :.   f)  a = Comp  (g (f a))
-
-\vspace{1ex}
-
-\pause
-Associated functors:
-
-> Trie     Void   = Empty
-> Trie     Unit   = Id
-> Trie (a  :+ b)  = Trie a  :*:  Trie b
-> Trie (a  :* b)  = Trie a  :.   Trie b
-
-}
-
-\framet{An \emph{almost} beautiful story}{
-
-\begin{itemize} \itemsep 3ex
-\item
-  Memoization: \emph{conversion of functions into data structures}.
-\item
-  Purely functional, directed by type isomorphisms.
-\item
-  Practical in a non-strict language!
-\item
-  Simple denotation \emph{and} incremental tabulation.
-\end{itemize}
-
-\vspace{3ex}
-
-However, an ironic flaw:
-
-\pause
-
-\begin{center}
-The type isomorphisms only hold for a \emph{strict} language.
-\end{center}
-
-%% \pause 
-%% Recall: imperative memoization has the opposite irony.
-
-}
-
-\framet{Some challenges}{
-
-\begin{itemize} \itemsep 3ex
-\item
-  Non-strict memoization
-\item
-  Higher-order memoization
-\item
-  Polymorphic memoization
-\item
-  Deep memoization
-\end{itemize}
-}
-
-\hypersetup{colorlinks=true,urlcolor=blue}
-
-\framet{References}{
-
-\begin{itemize} \itemsep 3ex
-\item Ralf Hinze's paper \href{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.43.3272}{\emph{Memo functions, polytypically!}}.
-\item \href{http://conal.net/talks/elegant-memoization/}{These slides}
-\item |MemoTrie|: \href{http://hackage.haskell.org/package/MemoTrie}{Hackage}, \href{https://github.com/conal/MemoTrie}{GitHub}
-\item \href{http://hackage.haskell.org/package/data-memocombinators}{data-memocombinators}
-\item \href{http://conal.net/blog/tag/trie/}{Memoization blog posts}
-\end{itemize}
-
 }
 
 \end{document}
