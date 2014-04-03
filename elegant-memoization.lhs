@@ -486,7 +486,7 @@ Laws:\vspace{-1ex}
 \framet{Boolean}{
 
 > instance HasTrie Bool where
->   type Bool :->: t = (t,t)
+>   type Bool :->: t = t :* t
 >   trie f = (f False, f True)
 >   untrie (x,y) = if' x y
 >     where if' x y c = if c then y else x
