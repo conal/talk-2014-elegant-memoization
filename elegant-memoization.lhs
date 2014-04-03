@@ -57,7 +57,7 @@
 \begin{itemize} \itemsep 3ex
 \item Value computed only when inspected.
 \item Saved for reuse.
-\item At every level of a data structure.
+\item Every part of a data structure.
 \item Insulate definition from use: \emph{modularity}.
 \item Routinely program with infinite structures.
 \end{itemize}
@@ -66,7 +66,7 @@
 \framet{What about functions?}{
 
 \begin{itemize} \itemsep 3ex
-\item Functions are indexed collections.
+\item Functions as indexed collections.
 \item Are ``accesses'' cached?
 \pitem Why not?
 \end{itemize}
@@ -79,6 +79,7 @@
 \pitem Ironic flaw: only correct for pure functions.
 \pitem My definition: \emph{conversion of functions into data structures}
 \pitem ... without loss of information.
+\pitem Preferably incremental.
 \pitem How?
 \end{itemize}
 }
@@ -134,13 +135,12 @@ I'll use some non-standard (for Haskell) type notation:
 \begin{itemize} \itemsep 4ex
 \item
   Remember: conversion of functions into data structures.
+% \item Functions as indexed collections.
 \item
-  Functions as indexed collections.
-\item
-  Differently shaped collection for each domain type.
+  Different shape for each domain type.
 \item
   Consider domain types systematically\pause:\\
-  |Unit|, |a :+ b|, |a :* b|, |a -> b|, |data|.
+  |Void|, |Unit|, |a :+ b|, |a :* b|, |a -> b|, |data|.
 \end{itemize}
 }
 
@@ -163,7 +163,7 @@ $$\begin{array}{rcl}
 \iso{\Void}{\Unit}
 \iso{\Unit}{a}
 \iso{(b + c)}{(b \to a) \times (c \to a)}
-\iso{(b \times c)}{c \to (b \to a)}
+\iso{(b \times c)}{b \to (c \to a)}
 \end{array}$$
 
 \pause
@@ -176,18 +176,18 @@ $$\begin{array}{rcl}
 \equi{0}{1}
 \equi{1}{a}
 \equi{b + c}{a^b \times a^c}
-\equi{b \times c}{(a ^ b) ^ c}
+\equi{b \times c}{(a ^ c) ^ b}
 \end{array}$$
 
 \vspace{2ex}
 
 \pause These rules form a memoization algorithm.
-\pause Termination?
+% \pause Termination?
 
 \vspace{1ex}
 
 \pause
-\emph{Catch:} bottoms.
+\emph{Catch:} |undefined|.
 
 }
 
@@ -288,7 +288,7 @@ $$\begin{array}{rcl}
 \equi{0}{1}
 \equi{1}{a}
 \equi{b + c}{a^b \times a^c}
-\equi{b \times c}{(a ^ b) ^ c}
+\equi{b \times c}{(a ^ c) ^ b}
 \end{array}$$
 
 \pause\vspace{2ex}
@@ -298,7 +298,7 @@ $$\begin{array}{rcl}
 \logEqui{0}{1}
 \logEqui{1}{a}
 \logEqui{b + c}{a^b \times a^c}
-\logEqui{b \times c}{(a ^ b) ^ c}
+\logEqui{b \times c}{(a ^ c) ^ b}
 \end{array}$$
 
 }
@@ -309,7 +309,7 @@ $$\begin{array}{rcl}
 \logEqui{0}{1}
 \logEqui{1}{a}
 \logEqui{b + c}{a^b \times a^c}
-\logEqui{b \times c}{(a ^ b) ^ c}
+\logEqui{b \times c}{(a ^ c) ^ b}
 \end{array}$$
 
 \pause\vspace{2ex} Game: whose memo trie is it?
@@ -341,7 +341,7 @@ $$\begin{array}{rcl}
 
 > BACK data LP  = False  | True
 > BACK data LS  = Zero   | Succ LS
-> BACK data LT  = Empty  | Dig LP LT
+> BACK data LT  = Empty  | Dig LT LP
 
 \end{minipage}}
 % \pause
@@ -349,7 +349,7 @@ $$\begin{array}{rcl}
 
 > LP  =~ Unit :+ Unit
 > LS  =~ Unit :+ SL
-> LT  =~ Unit :+ LP :* LT
+> LT  =~ Unit :+ LT :* LP
 
 \end{minipage}}
 \end{center}
