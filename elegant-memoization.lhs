@@ -193,12 +193,13 @@ $$\begin{array}{rcl}
 
 From \href{http://hackage.haskell.org/package/MemoTrie}{|MemoTrie|}:
 
-> class HasTrie a where
->   type (:->:) a :: * -> *
->   trie    :: (a   ->   t)  -> (a :->: t)
->   untrie  :: (a  :->:  t)  -> (a  ->  t)
+> class HasTrie t where
+>   type t :->: a
+>   trie    :: (t   ->   a)  -> (t :->: a)
+>   untrie  :: (t  :->:  a)  -> (t  ->  a)
 
-Law: |trie| and |untrie| are inverses (modulo |undefined|).
+Law: |trie| and |untrie| are inverses, so |(t :->: a) =~ (t -> a)| (modulo |undefined|).
+
 %% \\ \pause (Really, |untrie . trie <<= id|, and |trie . untrie == id|.)
 
 \vspace{3ex}
@@ -207,18 +208,27 @@ Memoization:
 
 \pause
 
-> memo :: HasTrie a => (a -> t) -> (a -> t)
+> memo :: HasTrie a => (t -> a) -> (t -> a)
 > memo = untrie . trie
 
 }
 
-\rnc{\iso}[2]{\\ \vspace{3ex}
-(Isomorphism: $#1 \to a \cong #2$.)}
+\rnc{\iso}[2]{
+
+Isomorphism: $#1 \to a \cong #2$.
+
+\vspace{2ex}
+
+Instance:
+
+}
 
 \framet{Void}{
 
+\iso{\Void}{\Unit}
+
 > instance HasTrie Void where
->   type Void :->: t = Unit
+>   type Void :->: a = Unit
 >   trie void = ()
 >   untrie () = void
 
@@ -227,25 +237,27 @@ where
 > void :: Void -> z
 > -- empty definition
 
-\iso{\Void}{\Unit}
-
 }
 
 \framet{Unit}{
 
-> instance HasTrie Unit where
->   type Unit :->: t = t
->   trie f = f ()
->   untrie x = \ () -> x
-
 \iso{\Unit}{a}
+
+> instance HasTrie Unit where
+>   type Unit :->: a = a
+>   trie f = f ()
+>   untrie a = \ () -> a
 
 }
 
+\nc{\Bool}{\Varid{Bool}}
+
 \framet{Boolean}{
 
+\iso{\Bool}{a \times a}
+
 > instance HasTrie Bool where
->   type Bool :->: t = t :* t
+>   type Bool :->: a = a :* a
 >   trie f = (f False, f True)
 >   untrie (x,y) = \ c -> if c then y else x
 
@@ -253,33 +265,33 @@ where
 
 \framet{Sums}{
 
-> instance (HasTrie a, HasTrie b) => HasTrie (a :+ b) where
->   type (a :+ b) :->: t = (a :->: t) :* (b :->: t)
+\iso{(b + c)}{(b \to a) \times (c \to a)}
+
+> instance (HasTrie b, HasTrie c) => HasTrie (b :+ c) where
+>   type (b :+ c) :->: a = (b :->: a) :* (c :->: a)
 >   trie f = (trie (f . Left), trie (f . Right))
 >   untrie (s,t) = untrie s ||| untrie t
 
 where
 
-> (g ||| h) (Left   a)  = g a
-> (g ||| h) (Right  b)  = h b
-
-\iso{(b + c)}{(b \to a) \times (c \to a)}
+> (g ||| h) (Left   b)  = g b
+> (g ||| h) (Right  c)  = h c
 
 }
 
 \framet{Products}{
 
-> instance (HasTrie a, HasTrie b) => HasTrie (a,b) where
->   type (a,b) :->: x = a :->: (b :->: x)
+\iso{(b \times c)}{b \to (c \to a)}
+
+> instance (HasTrie b, HasTrie c) => HasTrie (b :* c) where
+>   type (b :* c) :->: a = b :->: (c :->: a)
 >   trie f = trie (trie . curry f)
 >   untrie t = uncurry (untrie .  untrie t)
 
 where
 
-> curry    g x y    = g (x,y)
-> uncurry  h (x,y)  = h x y
-
-\iso{(b \times c)}{b \to (c \to a)}
+> curry    g b c    = g (b,c)
+> uncurry  h (b,c)  = h b c
 
 }
 
@@ -481,7 +493,7 @@ The type isomorphisms only hold for a \emph{strict} language.
 \framet{Void}{
 
 > instance HasTrie Void where
->   type Void :->: t = Unit
+>   type Void :->: a = Unit
 >   trie void = ()
 >   untrie () = void
 
@@ -515,9 +527,9 @@ Laws:\vspace{-1ex}
 \framet{Unit}{
 
 > instance HasTrie Unit where
->   type Unit :->: t = t
+>   type Unit :->: a = a
 >   trie f = f ()
->   untrie x = \ () -> x
+>   untrie a = \ () -> a
 
 \pause
 
@@ -533,10 +545,10 @@ Laws:\vspace{-1ex}
 \end{minipage}}
 \fbox{\begin{minipage}[t]{0.47\textwidth}
 
->      trie (untrie x)
-> ===  trie (\ () -> x)
-> ===  (\ () -> x) ()
-> ===  x
+>      trie (untrie a)
+> ===  trie (\ () -> a)
+> ===  (\ () -> a) ()
+> ===  a
 
 \end{minipage}}
 \end{center}
@@ -545,10 +557,9 @@ Laws:\vspace{-1ex}
 \framet{Boolean}{
 
 > instance HasTrie Bool where
->   type Bool :->: t = t :* t
+>   type Bool :->: a = a :* a
 >   trie f = (f False, f True)
->   untrie (x,y) = if' x y
->     where if' x y c = if c then y else x
+>   untrie (x,y) = \ c -> if c then y else x
 
 \vspace{-5ex}
 \pause
@@ -588,15 +599,15 @@ Laws:\vspace{-1ex}
 
 \framet{Sums}{
 
-> instance (HasTrie a, HasTrie b) => HasTrie (a :+ b) where
->   type (a :+ b) :->: t = (a :->: t) :* (b :->: t)
+> instance (HasTrie b, HasTrie c) => HasTrie (b :+ c) where
+>   type (b :+ c) :->: a = (b :->: a) :* (c :->: a)
 >   trie f = (trie (f . Left), trie (f . Right))
 >   untrie (s,t) = untrie s ||| untrie t
 
 where
 
-> (g ||| h) (Left   a)  = g a
-> (g ||| h) (Right  b)  = h b
+> (g ||| h) (Left   b)  = g b
+> (g ||| h) (Right  c)  = h c
 
 \vspace{-5ex}
 \pause
@@ -616,15 +627,15 @@ where
 
 \framet{Sums}{
 
-> instance (HasTrie a, HasTrie b) => HasTrie (a :+ b) where
->   type (a :+ b) :->: t = (a :->: t) :* (b :->: t)
+> instance (HasTrie b, HasTrie c) => HasTrie (b :+ c) where
+>   type (b :+ c) :->: a = (b :->: a) :* (c :->: a)
 >   trie f = (trie (f . Left), trie (f . Right))
 >   untrie (s,t) = untrie s ||| untrie t
 
 where
 
-> (g ||| h) (Left   a)  = g a
-> (g ||| h) (Right  b)  = h b
+> (g ||| h) (Left   b)  = g b
+> (g ||| h) (Right  c)  = h c
 
 \vspace{-5ex}
 \begin{center}
@@ -643,15 +654,15 @@ where
 
 \framet{Products}{
 
-> instance (HasTrie a, HasTrie b) => HasTrie (a,b) where
->   type (a,b) :->: x = a :->: (b :->: x)
+> instance (HasTrie b, HasTrie c) => HasTrie (b :* c) where
+>   type (b :* c) :->: a = b :->: (c :->: a)
 >   trie f = trie (trie . curry f)
 >   untrie t = uncurry (untrie .  untrie t)
 
 where
 
-> curry    g x y    = g (x,y)
-> uncurry  h (x,y)  = h x y
+> curry    g b c    = g (b,c)
+> uncurry  h (b,c)  = h b c
 
 \vspace{-5ex}
 \pause
@@ -671,15 +682,15 @@ where
 
 \framet{Products}{
 
-> instance (HasTrie a, HasTrie b) => HasTrie (a,b) where
->   type (a,b) :->: x = a :->: (b :->: x)
+> instance (HasTrie b, HasTrie c) => HasTrie (b :* c) where
+>   type (b :* c) :->: a = b :->: (c :->: a)
 >   trie f = trie (trie . curry f)
 >   untrie t = uncurry (untrie .  untrie t)
 
 where
 
-> curry    g x y   = g (x,y)
-> uncurry  h (x,y) = h x y
+> curry    g b c    = g (b,c)
+> uncurry  h (b,c)  = h b c
 
 \vspace{-5ex}
 \begin{center}
