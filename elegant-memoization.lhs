@@ -212,6 +212,9 @@ Memoization:
 
 }
 
+\rnc{\iso}[2]{\\ \vspace{3ex}
+(Isomorphism: $#1 \to a \cong #2$.)}
+
 \framet{Void}{
 
 > instance HasTrie Void where
@@ -224,6 +227,8 @@ where
 > void :: Void -> z
 > -- empty definition
 
+\iso{\Void}{\Unit}
+
 }
 
 \framet{Unit}{
@@ -232,6 +237,8 @@ where
 >   type Unit :->: t = t
 >   trie f = f ()
 >   untrie x = \ () -> x
+
+\iso{\Unit}{a}
 
 }
 
@@ -256,6 +263,8 @@ where
 > (g ||| h) (Left   a)  = g a
 > (g ||| h) (Right  b)  = h b
 
+\iso{(b + c)}{(b \to a) \times (c \to a)}
+
 }
 
 \framet{Products}{
@@ -269,6 +278,8 @@ where
 
 > curry    g x y    = g (x,y)
 > uncurry  h (x,y)  = h x y
+
+\iso{(b \times c)}{b \to (c \to a)}
 
 }
 
