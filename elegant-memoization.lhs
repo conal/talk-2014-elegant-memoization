@@ -445,12 +445,12 @@ $$\begin{array}{rcl}
 
 \pause\vspace{2ex}
 
-Take logarithms, let $a = \log_c u$ and $b = \log_c v$, and flip:
+Take logarithms, and flip equations:
 
 $$\begin{array}{rcl}
 \logEqui{c}{1}
-\logEqui{(u \times v)}{\log_c u + \log_c v}
-\logEqui{(v^a)}{a \times \log_c v}
+\logEqui{(c^a \times c^b)}{a + b}
+\logEqui{((c^b)^a)}{a \times b}
 \end{array}$$
 
 }
@@ -459,8 +459,8 @@ $$\begin{array}{rcl}
 
 $$\begin{array}{rcl}
 \logEqui{c}{1}
-\logEqui{(u \times v)}{\log_c u + \log_c v}
-\logEqui{(v^a)}{a \times \log_c v}
+\logEqui{(c^a \times c^b)}{a + b}
+\logEqui{((c^b)^a)}{a \times b}
 \end{array}$$
 
 \pause\vspace{2ex} Whose memo trie?
