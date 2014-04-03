@@ -88,6 +88,7 @@
 I'll use some non-standard (for Haskell) type notation:
 
 > type Unit  = ()
+> data Void 
 > type (:*)  = (,)
 > type (:+)  = Either
 >
@@ -153,15 +154,16 @@ I'll use some non-standard (for Haskell) type notation:
 
 }
 
-\nc{\iso}[2]{\pause #1 \to c &\cong& \pause #2 \\}
-\nc{\equi}[2]{\pause c^{#1} &=& #2 \\}
+\nc{\iso}[2]{\pause #1 \to a &\cong& \pause #2 \\}
+\nc{\equi}[2]{\pause a^{#1} &=& #2 \\}
 
 \framet{Type isomorphisms}{
 
 $$\begin{array}{rcl}
-\iso{1}{c}
-\iso{(a + b)}{(a \to c) \times (b \to c)}
-\iso{(a \times b)}{a \to (b \to c)}
+\iso{Void}{Unit}
+\iso{1}{a}
+\iso{(b + c)}{(b \to a) \times (c \to a)}
+\iso{(b \times c)}{c \to (b \to a)}
 \end{array}$$
 
 \pause
@@ -171,9 +173,10 @@ $$\begin{array}{rcl}
 Compare with laws of exponents:
 
 $$\begin{array}{rcl}
-\equi{1}{c}
-\equi{a + b}{c^a \times c^b}
-\equi{a \times b}{(c ^ b) ^ a}
+\equi{0}{1}
+\equi{1}{a}
+\equi{b + c}{a^b \times a^c}
+\equi{b \times c}{(a ^ b) ^ c}
 \end{array}$$
 
 \vspace{3ex}
@@ -194,8 +197,8 @@ From \href{http://hackage.haskell.org/package/MemoTrie}{|MemoTrie|}:
 
 > class HasTrie a where
 >   type (:->:) a :: * -> *
->   trie    :: (a   ->   c)  -> (a :->: c)
->   untrie  :: (a  :->:  c)  -> (a  ->  c)
+>   trie    :: (a   ->   t)  -> (a :->: t)
+>   untrie  :: (a  :->:  t)  -> (a  ->  t)
 
 Law: |trie| and |untrie| are inverses (modulo |undefined|).
 %% \\ \pause (Really, |untrie . trie <<= id|, and |trie . untrie == id|.)
@@ -206,7 +209,7 @@ Memoization:
 
 \pause
 
-> memo :: HasTrie a => (a -> c) -> (a -> c)
+> memo :: HasTrie a => (a -> t) -> (a -> t)
 > memo = untrie . trie
 
 }
@@ -214,9 +217,9 @@ Memoization:
 \framet{Unit}{
 
 > instance HasTrie Unit where
->   type Unit :->: c = c
+>   type Unit :->: t = t
 >   trie f = f ()
->   untrie c = \ () -> c
+>   untrie x = \ () -> x
 
 \pause
 
@@ -232,10 +235,10 @@ Laws:\vspace{-1ex}
 \end{minipage}}
 \fbox{\begin{minipage}[t]{0.47\textwidth}
 
->      trie (untrie c)
-> ===  trie (\ () -> c)
-> ===  (\ () -> c) ()
-> ===  c
+>      trie (untrie x)
+> ===  trie (\ () -> x)
+> ===  (\ () -> x) ()
+> ===  x
 
 \end{minipage}}
 \end{center}
@@ -244,7 +247,7 @@ Laws:\vspace{-1ex}
 \framet{Boolean}{
 
 > instance HasTrie Bool where
->   type Bool :->: x = (x,x)
+>   type Bool :->: t = (t,t)
 >   trie f = (f False, f True)
 >   untrie (x,y) = if' x y
 >     where if' x y c = if c then y else x
@@ -288,7 +291,7 @@ Laws:\vspace{-1ex}
 \framet{Sums}{
 
 > instance (HasTrie a, HasTrie b) => HasTrie (a :+ b) where
->   type (a :+ b) :->: x = (a :->: x) :* (b :->: x)
+>   type (a :+ b) :->: t = (a :->: t) :* (b :->: t)
 >   trie f = (trie (f . Left), trie (f . Right))
 >   untrie (s,t) = untrie s ||| untrie t
 
@@ -316,7 +319,7 @@ where
 \framet{Sums}{
 
 > instance (HasTrie a, HasTrie b) => HasTrie (a :+ b) where
->   type (a :+ b) :->: x = (a :->: x) :* (b :->: x)
+>   type (a :+ b) :->: t = (a :->: t) :* (b :->: t)
 >   trie f = (trie (f . Left), trie (f . Right))
 >   untrie (s,t) = untrie s ||| untrie t
 
@@ -399,13 +402,93 @@ where
 
 Handle other types via isomorphism:
 
-> a :* b :* c =~ (a :* b) :* c
+> u :* v :* w =~ (u :* v) :* w
 >
-> [a] =~ Unit :+ a :* [a]
+> [u] =~ Unit :+ u :* [u]
 >
-> T a =~ a :+ T a :* T a
+> T u =~ u :+ T u :* T u
 > 
 > Bool =~ Unit :+ Unit
+
+}
+
+\rnc{\equi}[2]{a^{#1} &=& #2 \\}
+
+\nc{\logEqui}[2]{\log_a #2 &=& #1 \\}
+
+\framet{Turn it around}{
+
+Exponentials:
+
+$$\begin{array}{rcl}
+\equi{0}{1}
+\equi{1}{a}
+\equi{b + c}{a^b \times a^c}
+\equi{b \times c}{(a ^ b) ^ c}
+\end{array}$$
+
+\pause\vspace{2ex}
+Take logarithms, and flip equations:
+
+$$\begin{array}{rcl}
+\logEqui{0}{1}
+\logEqui{1}{a}
+\logEqui{b + c}{a^b \times a^c}
+\logEqui{b \times c}{(a ^ b) ^ c}
+\end{array}$$
+
+}
+
+\framet{Logarithms}{
+
+$$\begin{array}{rcl}
+\logEqui{0}{1}
+\logEqui{1}{a}
+\logEqui{b + c}{a^b \times a^c}
+\logEqui{b \times c}{(a ^ b) ^ c}
+\end{array}$$
+
+\pause\vspace{2ex} Game: whose memo trie?
+
+\pause
+
+\begin{center}
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK data P  a = P a a
+> BACK data S  a = C a (S a)
+> BACK data T  a = B a (P (T a))
+
+\end{minipage}}
+\pause
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> BACK type P  a = a :* a
+> BACK type S  a = a :* S a
+> BACK type T  a = a :* P (T a)
+
+\end{minipage}}
+\end{center}
+
+\pause
+
+\begin{center}
+\fbox{\begin{minipage}[c]{0.53\textwidth}
+
+> BACK data LP  = False  | True
+> BACK data LS  = Zero   | Succ LS
+> BACK data LT  = Empty  | Dig LP LT
+
+\end{minipage}}
+% \pause
+\fbox{\begin{minipage}[c]{0.46\textwidth}
+
+> BACK type LP  = Unit :+ Unit
+> BACK type LS  = Unit :+ SL
+> BACK type LT  = Unit :+ LP :* LT
+
+\end{minipage}}
+\end{center}
 
 }
 
@@ -422,88 +505,9 @@ Functor combinators:
 \pause
 Associated functors:
 
-> Trie Unit      = Id
-> Trie (a :+ b)  = Trie a  :*:  Trie b
-> Trie (a :* b)  = Trie a  :.   Trie b
-
-}
-
-%% \nc{\iso}[2]{\pause #1 \to c &\cong& \pause #2 \\}
-
-\rnc{\equi}[2]{c^{#1} &=& #2 \\}
-\nc{\logEqui}[2]{\log_c #1 &=& #2 \\}
-
-\framet{Logarithms}{
-
-Exponentials:
-
-$$\begin{array}{rcl}
-\equi{1}{c}
-\equi{a + b}{c^a \times c^b}
-\equi{a \times b}{(c ^ b) ^ a}
-\end{array}$$
-
-\pause\vspace{2ex}
-
-Take logarithms, and flip equations:
-
-$$\begin{array}{rcl}
-\logEqui{c}{1}
-\logEqui{(c^a \times c^b)}{a + b}
-\logEqui{((c^b)^a)}{a \times b}
-\end{array}$$
-
-}
-
-\framet{Logarithms}{
-
-$$\begin{array}{rcl}
-\logEqui{c}{1}
-\logEqui{(c^a \times c^b)}{a + b}
-\logEqui{((c^b)^a)}{a \times b}
-\end{array}$$
-
-\pause\vspace{2ex} Whose memo trie?
-
-\pause
-
-\begin{center}
-\fbox{\begin{minipage}[c]{0.53\textwidth}
-
-> BACK data P  a = P a a
-> BACK data S  a = C a (S a)
-> BACK data T  a = B a (P (T a))
-
-\end{minipage}}
-\pause
-\fbox{\begin{minipage}[c]{0.46\textwidth}
-
-> BACK P  a = a :* a
-> BACK S  a = a :* S a
-> BACK T  a = a :* P (T a)
-
-\end{minipage}}
-\end{center}
-
-\pause
-
-\begin{center}
-\fbox{\begin{minipage}[c]{0.53\textwidth}
-
-> BACK data PL  = False  | True
-> BACK data SL  = Zero   | Succ SL
-> BACK data TL  = Empty  | Dig PL TL
-
-\end{minipage}}
-% \pause
-\fbox{\begin{minipage}[c]{0.46\textwidth}
-
-> BACK PL  = Unit :+ Unit
-> BACK SL  = Unit :+ SL
-> BACK TL  = Unit :+ PL :* TL
-
-\end{minipage}}
-\end{center}
+> Trie     Unit   = Id
+> Trie (a  :+ b)  = Trie a  :*:  Trie b
+> Trie (a  :* b)  = Trie a  :.   Trie b
 
 }
 
