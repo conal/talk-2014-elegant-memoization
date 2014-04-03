@@ -428,24 +428,44 @@ Associated functors:
 
 }
 
+%% \nc{\iso}[2]{\pause #1 \to c &\cong& \pause #2 \\}
+
+\rnc{\equi}[2]{c^{#1} &=& #2 \\}
+\nc{\logEqui}[2]{\log_c #1 &=& #2 \\}
+
 \framet{Logarithms}{
 
-Type isomorphisms:
-\begin{minipage}[c]{0.6\textwidth}
+Exponentials:
 
->    Unit   :->: c =~ c
-> (a :+ b)  :->: c =~ (a :->: c) :* (b :->: c)
-> (a :* b)  :->: c =~ a :->: (b :->: c)
+$$\begin{array}{rcl}
+\equi{1}{c}
+\equi{a + b}{c^a \times c^b}
+\equi{a \times b}{(c ^ b) ^ a}
+\end{array}$$
 
-\end{minipage}
+\pause\vspace{2ex}
+
+Take logarithms, let $a = \log_c u$ and $b = \log_c v$, and flip:
+
+$$\begin{array}{rcl}
+\logEqui{c}{1}
+\logEqui{(u \times v)}{\log_c u + \log_c v}
+\logEqui{(v^a)}{a \times \log_c v}
+\end{array}$$
+
+}
+
+\framet{Logarithms}{
+
+$$\begin{array}{rcl}
+\logEqui{c}{1}
+\logEqui{(u \times v)}{\log_c u + \log_c v}
+\logEqui{(v^a)}{a \times \log_c v}
+\end{array}$$
+
+\pause\vspace{2ex} Whose memo trie?
 
 \pause
-Re-interpret as recipe for \emph{logarithms}.
-(Whose memo trie?)
-
-\pause\vspace{3ex}
-
-Examples:
 
 \begin{center}
 \fbox{\begin{minipage}[c]{0.53\textwidth}
@@ -475,10 +495,10 @@ Examples:
 > BACK data TL  = Empty  | Dig PL TL
 
 \end{minipage}}
-\pause
+% \pause
 \fbox{\begin{minipage}[c]{0.46\textwidth}
 
-> BACK PL  = F :+ T
+> BACK PL  = Unit :+ Unit
 > BACK SL  = Unit :+ SL
 > BACK TL  = Unit :+ PL :* TL
 
