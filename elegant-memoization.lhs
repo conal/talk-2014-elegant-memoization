@@ -496,6 +496,7 @@ $$\begin{array}{rcl}
 
 Functor combinators:
 
+> data     Empty        a = Empty
 > newtype  Id           a = Id a
 > data     (f  :*:  g)  a = Prod  (f a :* g a)
 > newtype  (g  :.   f)  a = Comp  (g (f a))
@@ -505,6 +506,7 @@ Functor combinators:
 \pause
 Associated functors:
 
+> Trie     Void   = Empty
 > Trie     Unit   = Id
 > Trie (a  :+ b)  = Trie a  :*:  Trie b
 > Trie (a  :* b)  = Trie a  :.   Trie b
