@@ -1,5 +1,6 @@
 %% Misc lhs2TeX directives
 
+%format Void = " \mathbf{0} "
 %format Unit = " \mathbf{1} "
 %% %format Unit = " \mathbbm{1} "
 %format :* = " \times "
