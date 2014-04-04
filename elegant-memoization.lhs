@@ -208,7 +208,7 @@ Memoization:
 
 \pause
 
-> memo :: HasTrie a => (t -> a) -> (t -> a)
+> memo :: HasTrie t => (t -> a) -> (t -> a)
 > memo = untrie . trie
 
 }
@@ -332,7 +332,7 @@ Take logarithms, and flip equations:
 $$\begin{array}{rcl}
 \logEqui{0}{1}
 \logEqui{1}{a}
-\logEqui{b + c}{a^b \times a^c}
+\logEqui{b + c}{(a^b \times a^c)}
 \logEqui{b \times c}{(a ^ c) ^ b}
 \end{array}$$
 
@@ -343,7 +343,7 @@ $$\begin{array}{rcl}
 $$\begin{array}{rcl}
 \logEqui{0}{1}
 \logEqui{1}{a}
-\logEqui{b + c}{a^b \times a^c}
+\logEqui{b + c}{(a^b \times a^c)}
 \logEqui{b \times c}{(a ^ c) ^ b}
 \end{array}$$
 
@@ -385,7 +385,7 @@ $$\begin{array}{rcl}
 \fbox{\begin{minipage}[c]{0.46\textwidth}
 
 > LP  =~ Unit :+ Unit
-> LS  =~ Unit :+ SL
+> LS  =~ Unit :+ LS
 > LT  =~ Unit :+ LT :* LP
 
 \end{minipage}}
