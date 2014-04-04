@@ -217,7 +217,7 @@ Memoization:
 
 Isomorphism: $#1 \to a \cong #2$.
 
-\vspace{2ex}
+\pause\vspace{2ex}
 
 Instance:
 
