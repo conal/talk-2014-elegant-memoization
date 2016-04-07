@@ -338,13 +338,36 @@ $$\begin{array}{rcl}
 
 }
 
+\framet{Turn it around}{
+
+Exponentials:
+
+$$\begin{array}{rcl}
+\equi{0}{1}
+\equi{1}{a}
+\equi{b + c}{a^b \times a^c}
+\equi{b \times c}{(a ^ c) ^ b}
+\end{array}$$
+
+\vspace{2ex}
+Take logarithms, and flip equations:
+
+$$\begin{array}{rcl}
+\logEqui{0}{1}
+\logEqui{1}{a}
+\logEqui{\log_a u + \log_a v}{(u \times v)}
+\logEqui{b \times \log_a u}{(u ^ b)}
+\end{array}$$
+
+}
+
 \framet{Logarithms}{
 
 $$\begin{array}{rcl}
 \logEqui{0}{1}
 \logEqui{1}{a}
-\logEqui{b + c}{(a^b \times a^c)}
-\logEqui{b \times c}{(a ^ c) ^ b}
+\logEqui{\log_a u + \log_a v}{(u \times v)}
+\logEqui{b \times \log_a u}{(u ^ b)}
 \end{array}$$
 
 \pause\vspace{2ex} Game: whose memo trie is it?
@@ -410,7 +433,7 @@ Functor combinators:
 \pause
 
 \fbox{\begin{minipage}[c]{0.45\textwidth} \small
-Exponents:
+Exponentials:
 
 > Exp     Void   = Const Unit
 > Exp     Unit   = Id
