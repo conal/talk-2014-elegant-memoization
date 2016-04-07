@@ -589,7 +589,7 @@ Laws:\vspace{-1ex}
 \end{minipage}
 \begin{minipage}[c]{0.47\textwidth}
 
->      if' (f True) (f False)
+>      if' (f False) (f True)
 > ===  \ c -> if c then f True else f False
 > ===  \ c -> if c then f c else f c
 > ===  f
